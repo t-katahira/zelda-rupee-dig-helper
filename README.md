@@ -8,6 +8,10 @@
 2. モード選択で色を選んでからセルをクリック
 3. 「分析実行」で安全/危険な場所を予測
 
+## 🌐 ツールを使用
+
+[https://ユーザー名.github.io/zelda-rupee-dig-helper](https://ユーザー名.github.io/zelda-rupee-dig-helper)
+
 ## ⚠️ 免責事項
 
 - 非公式のファン作成ツールです
