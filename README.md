@@ -1,0 +1,1 @@
+# zelda-rupee-dig-helper
