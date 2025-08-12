@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ドキドキルピー掘り攻略支援ツール</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #2E7D32;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .controls {
+            margin-bottom: 20px;
+        }
+        
+        select, button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        select {
+            background: #f5f5f5;
+            border: 2px solid #ddd;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .mode-selector {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .mode-btn {
+            padding: 8px 16px;
+            border: 2px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .mode-btn.active {
+            background: #2196F3;
+            color: white;
+            border-color: #1976D2;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .info-item {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .grid {
+            display: inline-block;
+            border: 3px solid #2E7D32;
+            border-radius: 10px;
+            padding: 10px;
+            background: #1B5E20;
+            margin: 20px 0;
+        }
+        
+        .cell {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #4CAF50;
+            background: linear-gradient(45deg, #8BC34A, #689F38);
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 1px;
+            position: relative;
+            line-height: 1;
+        }
+        
+        .cell-main {
+            font-size: 12px;
+        }
+        
+        .cell-probability {
+            font-size: 8px;
+            margin-top: 2px;
+            opacity: 0.9;
+        }
+        
+        .cell:hover {
+            background: linear-gradient(45deg, #AED581, #7CB342);
+            transform: scale(1.05);
+        }
+        
+        .cell.unknown {
+            background: linear-gradient(45deg, #8BC34A, #689F38);
+        }
+        
+        .cell.green {
+            background: linear-gradient(45deg, #4CAF50, #388E3C);
+            color: white;
+        }
+        
+        .cell.blue {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+        }
+        
+        .cell.red {
+            background: linear-gradient(45deg, #F44336, #D32F2F);
+            color: white;
+        }
+        
+        .cell.silver {
+            background: linear-gradient(45deg, #9E9E9E, #616161);
+            color: white;
+        }
+        
+        .cell.gold {
+            background: linear-gradient(45deg, #FFD700, #FFA000);
+            color: #333;
+        }
+        
+        .cell.hazard {
+            background: linear-gradient(45deg, #8B0000, #5D0000);
+            color: white;
+        }
+        
+        .cell.safe {
+            background: linear-gradient(45deg, #00E676, #00C853);
+            color: white;
+            box-shadow: 0 0 10px rgba(0, 230, 118, 0.5);
+        }
+        
+        .cell.danger {
+            background: linear-gradient(45deg, #FF1744, #D50000);
+            color: white;
+            box-shadow: 0 0 10px rgba(255, 23, 68, 0.5);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .analysis-panel {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .analysis-title {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #2E7D32;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            background: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+        
+        .instructions {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+            border-radius: 5px;
+        }
+        
+        .instructions h3 {
+            margin-top: 0;
+            color: #1976D2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗡️ ドキドキルピー掘り攻略支援ツール ⚔️</h1>
+        
+        <div class="instructions">
+            <h3>使い方</h3>
+            <p><strong>1.</strong> ゲーム内で掘った結果を、このツールの同じ位置のセルにクリックして入力</p>
+            <p><strong>2.</strong> モード選択でセルの種類を選んでからクリック</p>
+            <p><strong>3.</strong> 「分析実行」で危険度を計算し、安全な場所を見つける</p>
+        </div>
+        
+        <div class="controls">
+            <select id="difficulty">
+                <option value="beginner">初級 (4×5) - ハズレ4個</option>
+                <option value="intermediate">中級 (5×6) - ハズレ4個・ババ4個</option>
+                <option value="advanced">上級 (5×8) - ハズレ8個・ババ8個</option>
+            </select>
+            <button onclick="resetGrid()">リセット</button>
+            <button onclick="analyzeGrid()">分析実行</button>
+        </div>
+        
+        <div class="mode-selector">
+            <div class="mode-btn active" onclick="setMode('unknown')" id="mode-unknown">未掘り</div>
+            <div class="mode-btn" onclick="setMode('green')" id="mode-green">緑</div>
+            <div class="mode-btn" onclick="setMode('blue')" id="mode-blue">青</div>
+            <div class="mode-btn" onclick="setMode('red')" id="mode-red">赤</div>
+            <div class="mode-btn" onclick="setMode('silver')" id="mode-silver">銀</div>
+            <div class="mode-btn" onclick="setMode('gold')" id="mode-gold">金</div>
+            <div class="mode-btn" onclick="setMode('hazard')" id="mode-hazard">ハズレ/ババ</div>
+        </div>
+        
+        <div class="game-info">
+            <div class="info-item">
+                <strong>難易度:</strong> <span id="current-difficulty">初級</span>
+            </div>
+            <div class="info-item">
+                <strong>入力済み:</strong> <span id="input-count">0</span>
+            </div>
+            <div class="info-item">
+                <strong>残りハズレ/ババ:</strong> <span id="remaining-hazards">4</span>
+            </div>
+        </div>
+        
+        <div id="game-grid"></div>
+        
+        <div class="analysis-panel">
+            <div class="analysis-title">分析結果</div>
+            <div id="analysis-result">分析を実行してください</div>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(45deg, #8BC34A, #689F38);"></div>
+                <span>未掘り</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(45deg, #4CAF50, #388E3C);"></div>
+                <span>緑</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(45deg, #2196F3, #1976D2);"></div>
+                <span>青</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(45deg, #F44336, #D32F2F);"></div>
+                <span>赤</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(45deg, #9E9E9E, #616161);"></div>
+                <span>銀</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(45deg, #FFD700, #FFA000);"></div>
+                <span>金</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(45deg, #8B0000, #5D0000);"></div>
+                <span>ハズレ/ババ</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(45deg, #00E676, #00C853);"></div>
+                <span>安全予測</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(45deg, #FF1744, #D50000);"></div>
+                <span>危険予測</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let gameGrid = [];
+        let currentMode = 'unknown';
+        let currentDifficulty = 'beginner';
+        let rows, cols, totalHazards;
+        
+        const difficulties = {
+            beginner: { rows: 4, cols: 5, hazards: 4, name: '初級' },
+            intermediate: { rows: 5, cols: 6, hazards: 8, name: '中級' },
+            advanced: { rows: 5, cols: 8, hazards: 16, name: '上級' }
+        };
+        
+        function initGrid() {
+            const diff = difficulties[currentDifficulty];
+            rows = diff.rows;
+            cols = diff.cols;
+            totalHazards = diff.hazards;
+            
+            gameGrid = [];
+            for (let i = 0; i < rows; i++) {
+                gameGrid[i] = [];
+                for (let j = 0; j < cols; j++) {
+                    gameGrid[i][j] = {
+                        state: 'unknown', // unknown, green, blue, red, silver, gold, hazard
+                        analysis: 'unknown', // unknown, safe, danger
+                        probability: null // 0-100 or null
+                    };
+                }
+            }
+            
+            createGrid();
+            updateDisplay();
+        }
+        
+        function createGrid() {
+            const gridElement = document.getElementById('game-grid');
+            gridElement.innerHTML = '';
+            gridElement.style.display = 'grid';
+            gridElement.style.gridTemplateColumns = `repeat(${cols}, 50px)`;
+            gridElement.style.gap = '2px';
+            gridElement.className = 'grid';
+            
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell unknown';
+                    cell.onclick = () => setCellState(i, j);
+                    cell.id = `cell-${i}-${j}`;
+                    gridElement.appendChild(cell);
+                }
+            }
+        }
+        
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`mode-${mode}`).classList.add('active');
+        }
+        
+        function setCellState(row, col) {
+            gameGrid[row][col].state = currentMode;
+            gameGrid[row][col].analysis = 'unknown';
+            gameGrid[row][col].probability = null;
+            updateDisplay();
+        }
+        
+        function updateDisplay() {
+            let inputCount = 0;
+            let hazardCount = 0;
+            
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    const cell = gameGrid[i][j];
+                    const cellElement = document.getElementById(`cell-${i}-${j}`);
+                    
+                    if (cell.state !== 'unknown') {
+                        inputCount++;
+                    }
+                    if (cell.state === 'hazard') {
+                        hazardCount++;
+                    }
+                    
+                    // 基本の状態クラスを設定
+                    cellElement.className = `cell ${cell.state}`;
+                    
+                    // 分析結果のクラスを追加
+                    if (cell.analysis === 'safe') {
+                        cellElement.classList.add('safe');
+                    } else if (cell.analysis === 'danger') {
+                        cellElement.classList.add('danger');
+                    }
+                    
+                    // 表示テキスト
+                    const displays = {
+                        unknown: '',
+                        green: '緑',
+                        blue: '青',
+                        red: '赤',
+                        silver: '銀',
+                        gold: '金',
+                        hazard: '×'
+                    };
+                    
+                    const mainText = displays[cell.state];
+                    let probabilityText = '';
+                    
+                    if (cell.state === 'unknown' && cell.probability !== null) {
+                        probabilityText = `${cell.probability}%`;
+                    }
+                    
+                    if (mainText && probabilityText) {
+                        cellElement.innerHTML = `<div class="cell-main">${mainText}</div><div class="cell-probability">${probabilityText}</div>`;
+                    } else if (probabilityText && cell.state === 'unknown') {
+                        cellElement.innerHTML = `<div class="cell-probability">${probabilityText}</div>`;
+                    } else {
+                        cellElement.innerHTML = `<div class="cell-main">${mainText}</div>`;
+                    }
+                }
+            }
+            
+            document.getElementById('input-count').textContent = inputCount;
+            document.getElementById('remaining-hazards').textContent = totalHazards - hazardCount;
+            document.getElementById('current-difficulty').textContent = difficulties[currentDifficulty].name;
+        }
+        
+        function analyzeGrid() {
+            // まず全セルの分析状態をリセット
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    if (gameGrid[i][j].state === 'unknown') {
+                        gameGrid[i][j].analysis = 'unknown';
+                        gameGrid[i][j].probability = null;
+                    }
+                }
+            }
+            
+            let safeCount = 0;
+            let dangerCount = 0;
+            let analysisText = [];
+            
+            // 緑の周辺は安全
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    if (gameGrid[i][j].state === 'green') {
+                        const neighbors = getNeighbors(i, j);
+                        neighbors.forEach(([ni, nj]) => {
+                            if (gameGrid[ni][nj].state === 'unknown') {
+                                gameGrid[ni][nj].analysis = 'safe';
+                                gameGrid[ni][nj].probability = 0;
+                                safeCount++;
+                            }
+                        });
+                    }
+                }
+            }
+            
+            // 制約チェック（簡易版）
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    const cell = gameGrid[i][j];
+                    if (['blue', 'red', 'silver', 'gold'].includes(cell.state)) {
+                        const neighbors = getNeighbors(i, j);
+                        const unknownNeighbors = neighbors.filter(([ni, nj]) => 
+                            gameGrid[ni][nj].state === 'unknown' && gameGrid[ni][nj].analysis !== 'safe'
+                        );
+                        const hazardNeighbors = neighbors.filter(([ni, nj]) => 
+                            gameGrid[ni][nj].state === 'hazard'
+                        );
+                        
+                        const expectedRange = getExpectedRange(cell.state);
+                        const currentHazards = hazardNeighbors.length;
+                        const remainingSlots = unknownNeighbors.length;
+                        
+                        // もし現在のハズレ数が最大値に達していれば、残りは安全
+                        if (currentHazards >= expectedRange.max) {
+                            unknownNeighbors.forEach(([ni, nj]) => {
+                                if (gameGrid[ni][nj].analysis !== 'safe') {
+                                    gameGrid[ni][nj].analysis = 'safe';
+                                    gameGrid[ni][nj].probability = 0;
+                                    safeCount++;
+                                }
+                            });
+                        }
+                        // もし残りスロットが最小必要数と同じなら、すべて危険
+                        else if (currentHazards + remainingSlots === expectedRange.min) {
+                            unknownNeighbors.forEach(([ni, nj]) => {
+                                gameGrid[ni][nj].analysis = 'danger';
+                                gameGrid[ni][nj].probability = 100;
+                                dangerCount++;
+                            });
+                        }
+                        // その他の場合は確率を計算
+                        else if (remainingSlots > 0) {
+                            const needHazards = expectedRange.min - currentHazards;
+                            const maxHazards = Math.min(expectedRange.max - currentHazards, remainingSlots);
+                            
+                            if (needHazards > 0 && maxHazards > 0) {
+                                // 平均的な確率を計算（簡易版）
+                                const avgNeedHazards = (needHazards + maxHazards) / 2;
+                                const probability = Math.round((avgNeedHazards / remainingSlots) * 100);
+                                
+                                unknownNeighbors.forEach(([ni, nj]) => {
+                                    if (gameGrid[ni][nj].probability === null) {
+                                        gameGrid[ni][nj].probability = probability;
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // 全体的な確率計算
+            calculateGlobalProbabilities();
+            
+            if (safeCount > 0) {
+                analysisText.push(`✅ 安全と推定される場所: ${safeCount}箇所`);
+            }
+            if (dangerCount > 0) {
+                analysisText.push(`⚠️ 危険と推定される場所: ${dangerCount}箇所`);
+            }
+            
+            // 確率情報を追加
+            const probabilities = [];
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    if (gameGrid[i][j].state === 'unknown' && gameGrid[i][j].probability !== null) {
+                        probabilities.push(gameGrid[i][j].probability);
+                    }
+                }
+            }
+            
+            if (probabilities.length > 0) {
+                const avgProb = Math.round(probabilities.reduce((a, b) => a + b, 0) / probabilities.length);
+                const minProb = Math.min(...probabilities);
+                const maxProb = Math.max(...probabilities);
+                analysisText.push(`📊 危険確率: 最小${minProb}% 最大${maxProb}% 平均${avgProb}%`);
+            }
+            
+            if (analysisText.length === 0) {
+                analysisText.push('現在の情報では、明確な推定はできません。');
+                analysisText.push('より多くの情報を入力してください。');
+            }
+            
+            // 全体的な進行状況
+            const totalCells = rows * cols;
+            const inputCells = countInputCells();
+            const progress = Math.round((inputCells / totalCells) * 100);
+            analysisText.push(`進行度: ${progress}% (${inputCells}/${totalCells})`);
+            
+            document.getElementById('analysis-result').innerHTML = analysisText.join('<br>');
+            updateDisplay();
+        }
+        
+        function calculateGlobalProbabilities() {
+            // 残りのハズレ/ババ数を計算
+            let knownHazards = 0;
+            let unknownCells = [];
+            
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    if (gameGrid[i][j].state === 'hazard') {
+                        knownHazards++;
+                    } else if (gameGrid[i][j].state === 'unknown' && gameGrid[i][j].analysis !== 'safe') {
+                        unknownCells.push([i, j]);
+                    }
+                }
+            }
+            
+            const remainingHazards = totalHazards - knownHazards;
+            const unknownCount = unknownCells.length;
+            
+            if (unknownCount > 0 && remainingHazards > 0) {
+                const globalProbability = Math.round((remainingHazards / unknownCount) * 100);
+                
+                // 局所的な確率が計算されていないセルに全体確率を適用
+                unknownCells.forEach(([i, j]) => {
+                    if (gameGrid[i][j].probability === null) {
+                        gameGrid[i][j].probability = globalProbability;
+                    }
+                });
+            }
+        }
+        
+        function getNeighbors(row, col) {
+            const neighbors = [];
+            for (let i = row - 1; i <= row + 1; i++) {
+                for (let j = col - 1; j <= col + 1; j++) {
+                    if (i >= 0 && i < rows && j >= 0 && j < cols && !(i === row && j === col)) {
+                        neighbors.push([i, j]);
+                    }
+                }
+            }
+            return neighbors;
+        }
+        
+        function getExpectedRange(color) {
+            const ranges = {
+                blue: { min: 1, max: 2 },
+                red: { min: 3, max: 4 },
+                silver: { min: 5, max: 6 },
+                gold: { min: 7, max: 8 }
+            };
+            return ranges[color];
+        }
+        
+        function countInputCells() {
+            let count = 0;
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    if (gameGrid[i][j].state !== 'unknown') {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }
+        
+        function resetGrid() {
+            currentDifficulty = document.getElementById('difficulty').value;
+            initGrid();
+            document.getElementById('analysis-result').textContent = '分析を実行してください';
+        }
+        
+        // 初期化
+        window.onload = function() {
+            resetGrid();
+        };
+    </script>
+</body>
+</html>
