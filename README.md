@@ -10,7 +10,7 @@
 
 ## 🌐 ツールを使用
 
-[https://t-katahira.github.io/zelda-rupee-dig-helper](https://ユーザー名.github.io/zelda-rupee-dig-helper)
+[[https://t-katahira.github.io/zelda-rupee-dig-helper](https://t-katahira.github.io/zelda-rupee-dig-helper/)]
 
 ## ⚠️ 免責事項
 
