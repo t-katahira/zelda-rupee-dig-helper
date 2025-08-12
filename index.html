@@ -337,6 +337,13 @@
             <div class="mode-btn" onclick="setMode('hazard')" id="mode-hazard">ハズレ/ババ</div>
         </div>
         
+        <div class="probability-controls" id="probability-controls" style="margin: 15px 0;">
+            <label style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px;">
+                <input type="checkbox" id="show-probability" checked onchange="toggleProbabilityDisplay()" style="transform: scale(1.2);">
+                <span>確率を表示する</span>
+            </label>
+        </div>
+        
         <div class="game-info">
             <div class="info-item">
                 <strong>難易度:</strong> <span id="current-difficulty">初級</span>
@@ -407,6 +414,7 @@
         let rows, cols, totalHazards;
         let appMode = 'helper'; // 'helper' or 'simulator'
         let gameState = 'ready'; // ready, playing, won, lost
+        let showProbability = true; // 確率表示のフラグ
         let simulatorGrid = []; // シミュレーター用の内部グリッド
         
         const difficulties = {
@@ -420,6 +428,7 @@
             document.getElementById('mode-helper').classList.add('active');
             document.getElementById('mode-simulator').classList.remove('active');
             document.getElementById('input-mode-selector').style.display = 'flex';
+            document.getElementById('probability-controls').style.display = 'block';
             document.getElementById('analyze-btn').style.display = 'inline-block';
             updateInstructionsForHelper();
             resetGrid();
@@ -430,9 +439,15 @@
             document.getElementById('mode-simulator').classList.add('active');
             document.getElementById('mode-helper').classList.remove('active');
             document.getElementById('input-mode-selector').style.display = 'none';
+            document.getElementById('probability-controls').style.display = 'none';
             document.getElementById('analyze-btn').style.display = 'none';
             updateInstructionsForSimulator();
             resetGrid();
+        }
+        
+        function toggleProbabilityDisplay() {
+            showProbability = document.getElementById('show-probability').checked;
+            updateDisplay();
         }
         
         function updateInstructionsForHelper() {
@@ -770,7 +785,7 @@
                     }
                     
                     // 攻略支援モードの確率表示
-                    if (appMode === 'helper' && cell.state === 'unknown' && cell.probability !== null) {
+                    if (appMode === 'helper' && showProbability && cell.state === 'unknown' && cell.probability !== null) {
                         probabilityText = `${cell.probability}%`;
                     }
                     
@@ -922,13 +937,18 @@
             // 残りのハズレ/ババ数を計算
             let knownHazards = 0;
             let unknownCells = [];
+            let safeCells = 0;
             
             for (let i = 0; i < rows; i++) {
                 for (let j = 0; j < cols; j++) {
                     if (gameGrid[i][j].state === 'hazard') {
                         knownHazards++;
-                    } else if (gameGrid[i][j].state === 'unknown' && gameGrid[i][j].analysis !== 'safe') {
-                        unknownCells.push([i, j]);
+                    } else if (gameGrid[i][j].state === 'unknown') {
+                        if (gameGrid[i][j].analysis === 'safe') {
+                            safeCells++;
+                        } else {
+                            unknownCells.push([i, j]);
+                        }
                     }
                 }
             }
@@ -937,13 +957,25 @@
             const unknownCount = unknownCells.length;
             
             if (unknownCount > 0 && remainingHazards > 0) {
-                const globalProbability = Math.round((remainingHazards / unknownCount) * 100);
+                // 重要な修正：残りハズレ数が未掘り数と同じ場合は100%
+                let globalProbability;
+                if (remainingHazards >= unknownCount) {
+                    globalProbability = 100;
+                } else {
+                    globalProbability = Math.round((remainingHazards / unknownCount) * 100);
+                }
                 
                 // 局所的な確率が計算されていないセルに全体確率を適用
                 unknownCells.forEach(([i, j]) => {
                     if (gameGrid[i][j].probability === null) {
                         gameGrid[i][j].probability = globalProbability;
                     }
+                });
+            } else if (unknownCount > 0 && remainingHazards === 0) {
+                // 残りハズレが0の場合、未掘りは全て安全
+                unknownCells.forEach(([i, j]) => {
+                    gameGrid[i][j].analysis = 'safe';
+                    gameGrid[i][j].probability = 0;
                 });
             }
         }
