@@ -61,6 +61,30 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
         
+        .mode-toggle {
+            padding: 12px 24px;
+            margin: 5px;
+            border: 2px solid #2E7D32;
+            background: #f8f9fa;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            color: #2E7D32;
+        }
+        
+        .mode-toggle.active {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border-color: #2E7D32;
+        }
+        
+        .mode-toggle:hover:not(.active) {
+            background: #e8f5e8;
+            transform: translateY(-1px);
+        }
+        
         .mode-selector {
             margin: 20px 0;
             display: flex;
@@ -71,18 +95,25 @@
         
         .mode-btn {
             padding: 8px 16px;
-            border: 2px solid #ddd;
-            background: white;
+            border: 2px solid #2196F3;
+            background: #e3f2fd;
             cursor: pointer;
             border-radius: 6px;
             font-size: 14px;
             transition: all 0.2s ease;
+            color: #1976D2;
+            font-weight: 500;
         }
         
         .mode-btn.active {
             background: #2196F3;
             color: white;
             border-color: #1976D2;
+        }
+        
+        .mode-btn:hover:not(.active) {
+            background: #bbdefb;
+            transform: translateY(-1px);
         }
         
         .game-info {
@@ -112,13 +143,12 @@
         .cell {
             width: 50px;
             height: 50px;
-            border: 2px solid #4CAF50;
-            background: linear-gradient(45deg, #8BC34A, #689F38);
+            border: 1px solid rgba(0,0,0,0.1);
+            background: #f5f5f5;
             cursor: pointer;
             font-size: 10px;
             font-weight: bold;
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            color: #424242;
             transition: all 0.2s ease;
             display: flex;
             flex-direction: column;
@@ -127,6 +157,8 @@
             margin: 1px;
             position: relative;
             line-height: 1;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
         }
         
         .cell-main {
@@ -134,60 +166,77 @@
         }
         
         .cell-probability {
-            font-size: 8px;
+            font-size: 10px;
             margin-top: 2px;
-            opacity: 0.9;
+            opacity: 1;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
         
         .cell:hover {
-            background: linear-gradient(45deg, #AED581, #7CB342);
-            transform: scale(1.05);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+            transform: translateY(-1px);
         }
         
         .cell.unknown {
-            background: linear-gradient(45deg, #8BC34A, #689F38);
+            background: #f5f5f5;
+            border-color: #e0e0e0;
         }
         
         .cell.green {
-            background: linear-gradient(45deg, #4CAF50, #388E3C);
+            background: #4CAF50;
             color: white;
+            border-color: #388E3C;
         }
         
         .cell.blue {
-            background: linear-gradient(45deg, #2196F3, #1976D2);
+            background: #2196F3;
             color: white;
+            border-color: #1976D2;
         }
         
         .cell.red {
-            background: linear-gradient(45deg, #F44336, #D32F2F);
+            background: #F44336;
             color: white;
+            border-color: #D32F2F;
         }
         
         .cell.silver {
-            background: linear-gradient(45deg, #9E9E9E, #616161);
+            background: #9E9E9E;
             color: white;
+            border-color: #616161;
         }
         
         .cell.gold {
-            background: linear-gradient(45deg, #FFD700, #FFA000);
-            color: #333;
+            background: #FFC107;
+            color: #212121;
+            border-color: #F57C00;
         }
         
         .cell.hazard {
-            background: linear-gradient(45deg, #8B0000, #5D0000);
+            background: #D32F2F;
             color: white;
+            border-color: #B71C1C;
+        }
+        
+        .cell.baba {
+            background: #FF5722;
+            color: white;
+            border-color: #D84315;
         }
         
         .cell.safe {
-            background: linear-gradient(45deg, #00E676, #00C853);
+            background: #4CAF50;
             color: white;
-            box-shadow: 0 0 10px rgba(0, 230, 118, 0.5);
+            border-color: #388E3C;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
         }
         
         .cell.danger {
-            background: linear-gradient(45deg, #FF1744, #D50000);
+            background: #F44336;
             color: white;
-            box-shadow: 0 0 10px rgba(255, 23, 68, 0.5);
+            border-color: #D32F2F;
+            box-shadow: 0 0 10px rgba(244, 67, 54, 0.3);
             animation: pulse 2s infinite;
         }
         
@@ -257,23 +306,28 @@
         <h1>🗡️ ドキドキルピー掘り攻略支援ツール ⚔️</h1>
         
         <div class="instructions">
-            <h3>使い方</h3>
+            <h3>攻略支援モード - 使い方</h3>
             <p><strong>1.</strong> ゲーム内で掘った結果を、このツールの同じ位置のセルにクリックして入力</p>
-            <p><strong>2.</strong> モード選択でセルの種類を選んでからクリック</p>
-            <p><strong>3.</strong> 「分析実行」で危険度を計算し、安全な場所を見つける</p>
+            <p><strong>2.</strong> モード選択でセルの種類を選んでからクリック（自動で分析実行されます）</p>
+            <p><strong>3.</strong> 確率を参考に安全な場所を選択してください</p>
         </div>
         
         <div class="controls">
+            <div style="margin-bottom: 15px;">
+                <button id="mode-helper" class="mode-toggle active" onclick="switchToHelper()">攻略支援モード</button>
+                <button id="mode-simulator" class="mode-toggle" onclick="switchToSimulator()">シミュレーターモード</button>
+            </div>
+            
             <select id="difficulty">
                 <option value="beginner">初級 (4×5) - ハズレ4個</option>
                 <option value="intermediate">中級 (5×6) - ハズレ4個・ババ4個</option>
                 <option value="advanced">上級 (5×8) - ハズレ8個・ババ8個</option>
             </select>
             <button onclick="resetGrid()">リセット</button>
-            <button onclick="analyzeGrid()">分析実行</button>
+            <button id="analyze-btn" onclick="analyzeGrid()">分析実行</button>
         </div>
         
-        <div class="mode-selector">
+        <div class="mode-selector" id="input-mode-selector">
             <div class="mode-btn active" onclick="setMode('unknown')" id="mode-unknown">未掘り</div>
             <div class="mode-btn" onclick="setMode('green')" id="mode-green">緑</div>
             <div class="mode-btn" onclick="setMode('blue')" id="mode-blue">青</div>
@@ -304,39 +358,43 @@
         
         <div class="legend">
             <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(45deg, #8BC34A, #689F38);"></div>
+                <div class="legend-color" style="background: #f5f5f5; border: 1px solid #e0e0e0;"></div>
                 <span>未掘り</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(45deg, #4CAF50, #388E3C);"></div>
+                <div class="legend-color" style="background: #4CAF50;"></div>
                 <span>緑</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(45deg, #2196F3, #1976D2);"></div>
+                <div class="legend-color" style="background: #2196F3;"></div>
                 <span>青</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(45deg, #F44336, #D32F2F);"></div>
+                <div class="legend-color" style="background: #F44336;"></div>
                 <span>赤</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(45deg, #9E9E9E, #616161);"></div>
+                <div class="legend-color" style="background: #9E9E9E;"></div>
                 <span>銀</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(45deg, #FFD700, #FFA000);"></div>
+                <div class="legend-color" style="background: #FFC107;"></div>
                 <span>金</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(45deg, #8B0000, #5D0000);"></div>
-                <span>ハズレ/ババ</span>
+                <div class="legend-color" style="background: #D32F2F;"></div>
+                <span>ハズレ</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(45deg, #00E676, #00C853);"></div>
+                <div class="legend-color" style="background: #FF5722;"></div>
+                <span>ババ</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #4CAF50; box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);"></div>
                 <span>安全予測</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(45deg, #FF1744, #D50000);"></div>
+                <div class="legend-color" style="background: #F44336; box-shadow: 0 0 5px rgba(244, 67, 54, 0.5);"></div>
                 <span>危険予測</span>
             </div>
         </div>
@@ -347,12 +405,56 @@
         let currentMode = 'unknown';
         let currentDifficulty = 'beginner';
         let rows, cols, totalHazards;
+        let appMode = 'helper'; // 'helper' or 'simulator'
+        let gameState = 'ready'; // ready, playing, won, lost
+        let simulatorGrid = []; // シミュレーター用の内部グリッド
         
         const difficulties = {
             beginner: { rows: 4, cols: 5, hazards: 4, name: '初級' },
             intermediate: { rows: 5, cols: 6, hazards: 8, name: '中級' },
             advanced: { rows: 5, cols: 8, hazards: 16, name: '上級' }
         };
+        
+        function switchToHelper() {
+            appMode = 'helper';
+            document.getElementById('mode-helper').classList.add('active');
+            document.getElementById('mode-simulator').classList.remove('active');
+            document.getElementById('input-mode-selector').style.display = 'flex';
+            document.getElementById('analyze-btn').style.display = 'inline-block';
+            updateInstructionsForHelper();
+            resetGrid();
+        }
+        
+        function switchToSimulator() {
+            appMode = 'simulator';
+            document.getElementById('mode-simulator').classList.add('active');
+            document.getElementById('mode-helper').classList.remove('active');
+            document.getElementById('input-mode-selector').style.display = 'none';
+            document.getElementById('analyze-btn').style.display = 'none';
+            updateInstructionsForSimulator();
+            resetGrid();
+        }
+        
+        function updateInstructionsForHelper() {
+            const instructions = document.querySelector('.instructions');
+            instructions.innerHTML = `
+                <h3>攻略支援モード - 使い方</h3>
+                <p><strong>1.</strong> ゲーム内で掘った結果を、このツールの同じ位置のセルにクリックして入力</p>
+                <p><strong>2.</strong> モード選択でセルの種類を選んでからクリック（自動で分析実行されます）</p>
+                <p><strong>3.</strong> 確率を参考に安全な場所を選択してください</p>
+            `;
+        }
+        
+        function updateInstructionsForSimulator() {
+            const instructions = document.querySelector('.instructions');
+            instructions.innerHTML = `
+                <h3>シミュレーターモード - 使い方</h3>
+                <p><strong>1.</strong> リセットボタンで新しいゲームを開始</p>
+                <p><strong>2.</strong> セルをクリックして掘る</p>
+                <p><strong>3.</strong> ハズレ/ババを避けてすべてのルピーを見つける</p>
+                <p><strong>4.</strong> 練習してから本番のゲームに挑戦！</p>
+            `;
+        }
         
         function initGrid() {
             const diff = difficulties[currentDifficulty];
@@ -372,8 +474,90 @@
                 }
             }
             
+            if (appMode === 'simulator') {
+                initSimulator();
+            }
+            
             createGrid();
             updateDisplay();
+        }
+        
+        function initSimulator() {
+            // シミュレーター用の内部グリッドを初期化
+            simulatorGrid = [];
+            for (let i = 0; i < rows; i++) {
+                simulatorGrid[i] = [];
+                for (let j = 0; j < cols; j++) {
+                    simulatorGrid[i][j] = {
+                        isHazard: false,
+                        isBaba: false,
+                        isDug: false,
+                        color: null,
+                        display: ''
+                    };
+                }
+            }
+            
+            // ハズレとババを配置
+            const hazards = difficulties[currentDifficulty].hazards / 2;
+            const babas = difficulties[currentDifficulty].hazards / 2;
+            const totalHazards = hazards + babas;
+            const positions = [];
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    positions.push({row: i, col: j});
+                }
+            }
+            
+            // シャッフル
+            for (let i = positions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [positions[i], positions[j]] = [positions[j], positions[i]];
+            }
+            
+            // ハズレを配置
+            for (let i = 0; i < hazards; i++) {
+                simulatorGrid[positions[i].row][positions[i].col].isHazard = true;
+            }
+            
+            // ババを配置
+            for (let i = hazards; i < totalHazards; i++) {
+                simulatorGrid[positions[i].row][positions[i].col].isBaba = true;
+            }
+            
+            // 各セルの色を決定
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    if (!simulatorGrid[i][j].isHazard && !simulatorGrid[i][j].isBaba) {
+                        const neighborHazards = countNeighborHazards(i, j);
+                        simulatorGrid[i][j].color = getColorFromCount(neighborHazards);
+                    }
+                }
+            }
+            
+            gameState = 'playing';
+        }
+        
+        function countNeighborHazards(row, col) {
+            let count = 0;
+            for (let i = row - 1; i <= row + 1; i++) {
+                for (let j = col - 1; j <= col + 1; j++) {
+                    if (i >= 0 && i < rows && j >= 0 && j < cols && !(i === row && j === col)) {
+                        if (simulatorGrid[i][j].isHazard || simulatorGrid[i][j].isBaba) {
+                            count++;
+                        }
+                    }
+                }
+            }
+            return count;
+        }
+        
+        function getColorFromCount(count) {
+            if (count === 0) return 'green';
+            if (count <= 2) return 'blue';
+            if (count <= 4) return 'red';
+            if (count <= 6) return 'silver';
+            return 'gold';
         }
         
         function createGrid() {
@@ -388,10 +572,118 @@
                 for (let j = 0; j < cols; j++) {
                     const cell = document.createElement('div');
                     cell.className = 'cell unknown';
-                    cell.onclick = () => setCellState(i, j);
+                    cell.onclick = () => handleCellClick(i, j);
                     cell.id = `cell-${i}-${j}`;
                     gridElement.appendChild(cell);
                 }
+            }
+        }
+        
+        function handleCellClick(row, col) {
+            if (appMode === 'helper') {
+                setCellState(row, col);
+            } else if (appMode === 'simulator') {
+                digCell(row, col);
+            }
+        }
+        
+        function digCell(row, col) {
+            if (gameState !== 'playing' || simulatorGrid[row][col].isDug) return;
+            
+            const cell = simulatorGrid[row][col];
+            cell.isDug = true;
+            
+            if (cell.isHazard) {
+                // ハズレの場合はゲームオーバー
+                cell.display = 'ハズレ';
+                gameState = 'lost';
+                showMessage('ゲームオーバー！ハズレを引いてしまいました...', 'failure');
+                revealAllHazards();
+                gameGrid[row][col].state = 'hazard';
+            } else if (cell.isBaba) {
+                // ババの場合はゲーム続行
+                cell.display = 'ババ';
+                showMessage('ババを引きました！でもゲーム続行です。', 'warning');
+                gameGrid[row][col].state = 'baba';
+            } else {
+                // 通常のセル
+                cell.display = getDisplayForColor(cell.color);
+                gameGrid[row][col].state = cell.color;
+                
+                // 勝利条件チェック
+                if (checkWin()) {
+                    gameState = 'won';
+                    showMessage('おめでとうございます！すべてのルピーを見つけました！', 'success');
+                }
+            }
+            
+            updateDisplay();
+        }
+        
+        function getDisplayForColor(color) {
+            const displays = {
+                green: '緑',
+                blue: '青',
+                red: '赤',
+                silver: '銀',
+                gold: '金'
+            };
+            return displays[color] || '';
+        }
+        
+        function checkWin() {
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    const cell = simulatorGrid[i][j];
+                    if (!cell.isDug && !cell.isHazard && !cell.isBaba) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        
+        function revealAllHazards() {
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    const cell = simulatorGrid[i][j];
+                    if (cell.isHazard && !cell.isDug) {
+                        cell.isDug = true;
+                        cell.display = 'ハズレ';
+                        gameGrid[i][j].state = 'hazard';
+                    }
+                    // ババは既に掘られている可能性があるので、掘られていないババのみ表示
+                    if (cell.isBaba && !cell.isDug) {
+                        cell.isDug = true;
+                        cell.display = 'ババ';
+                        gameGrid[i][j].state = 'baba';
+                    }
+                }
+            }
+        }
+        
+        function showMessage(text, type) {
+            const messageElement = document.getElementById('message');
+            if (messageElement) {
+                messageElement.textContent = text;
+                messageElement.className = `message ${type}`;
+            } else {
+                // メッセージ要素がない場合は分析結果欄に表示
+                let bgColor = '#f8f9fa';
+                let textColor = '#333';
+                
+                if (type === 'success') {
+                    bgColor = '#4CAF50';
+                    textColor = 'white';
+                } else if (type === 'failure') {
+                    bgColor = '#F44336';
+                    textColor = 'white';
+                } else if (type === 'warning') {
+                    bgColor = '#FF9800';
+                    textColor = 'white';
+                }
+                
+                document.getElementById('analysis-result').innerHTML = `<div style="margin: 10px 0; padding: 15px; border-radius: 10px; background: ${bgColor}; color: ${textColor}; font-weight: bold;">${text}</div>`;
             }
         }
         
@@ -406,6 +698,14 @@
             gameGrid[row][col].analysis = 'unknown';
             gameGrid[row][col].probability = null;
             updateDisplay();
+            
+            // 攻略支援モードで色が設定された場合、自動で分析実行
+            if (appMode === 'helper' && currentMode !== 'unknown') {
+                // 短時間の遅延後に分析実行（UIの更新を待つため）
+                setTimeout(() => {
+                    analyzeGrid();
+                }, 100);
+            }
         }
         
         function updateDisplay() {
@@ -417,11 +717,21 @@
                     const cell = gameGrid[i][j];
                     const cellElement = document.getElementById(`cell-${i}-${j}`);
                     
-                    if (cell.state !== 'unknown') {
-                        inputCount++;
-                    }
-                    if (cell.state === 'hazard') {
-                        hazardCount++;
+                    if (appMode === 'simulator' && simulatorGrid[i] && simulatorGrid[i][j]) {
+                        const simCell = simulatorGrid[i][j];
+                        if (simCell.isDug) {
+                            inputCount++;
+                            if (simCell.isHazard || simCell.isBaba) {
+                                hazardCount++;
+                            }
+                        }
+                    } else {
+                        if (cell.state !== 'unknown') {
+                            inputCount++;
+                        }
+                        if (cell.state === 'hazard') {
+                            hazardCount++;
+                        }
                     }
                     
                     // 基本の状態クラスを設定
@@ -442,13 +752,25 @@
                         red: '赤',
                         silver: '銀',
                         gold: '金',
-                        hazard: '×'
+                        hazard: '×',
+                        baba: 'ババ'
                     };
                     
-                    const mainText = displays[cell.state];
+                    let mainText = displays[cell.state];
                     let probabilityText = '';
                     
-                    if (cell.state === 'unknown' && cell.probability !== null) {
+                    // シミュレーターモードの場合
+                    if (appMode === 'simulator' && simulatorGrid[i] && simulatorGrid[i][j] && simulatorGrid[i][j].isDug) {
+                        mainText = simulatorGrid[i][j].display;
+                        if (simulatorGrid[i][j].isHazard) {
+                            cellElement.classList.add('hazard');
+                        } else if (simulatorGrid[i][j].isBaba) {
+                            cellElement.classList.add('baba');
+                        }
+                    }
+                    
+                    // 攻略支援モードの確率表示
+                    if (appMode === 'helper' && cell.state === 'unknown' && cell.probability !== null) {
                         probabilityText = `${cell.probability}%`;
                     }
                     
@@ -663,12 +985,13 @@
         function resetGrid() {
             currentDifficulty = document.getElementById('difficulty').value;
             initGrid();
-            document.getElementById('analysis-result').textContent = '分析を実行してください';
+            document.getElementById('analysis-result').textContent = appMode === 'helper' ? '分析を実行してください' : 'ゲームを開始しました！セルをクリックして掘ってください。';
+            gameState = appMode === 'simulator' ? 'playing' : 'ready';
         }
         
         // 初期化
         window.onload = function() {
-            resetGrid();
+            switchToHelper();
         };
     </script>
 </body>
