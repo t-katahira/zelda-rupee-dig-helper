@@ -354,6 +354,9 @@
             <div class="info-item">
                 <strong>残りハズレ/ババ:</strong> <span id="remaining-hazards">4</span>
             </div>
+            <div class="info-item">
+                <strong>獲得ルピー:</strong> <span id="total-rupees">0</span>
+            </div>
         </div>
         
         <div id="game-grid"></div>
@@ -370,31 +373,31 @@
             </div>
             <div class="legend-item">
                 <div class="legend-color" style="background: #4CAF50;"></div>
-                <span>緑</span>
+                <span>緑 (1ルピー)</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color" style="background: #2196F3;"></div>
-                <span>青</span>
+                <span>青 (5ルピー)</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color" style="background: #F44336;"></div>
-                <span>赤</span>
+                <span>赤 (20ルピー)</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color" style="background: #9E9E9E;"></div>
-                <span>銀</span>
+                <span>銀 (100ルピー)</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color" style="background: #FFC107;"></div>
-                <span>金</span>
+                <span>金 (300ルピー)</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color" style="background: #D32F2F;"></div>
-                <span>ハズレ</span>
+                <span>ハズレ (0ルピー)</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color" style="background: #FF5722;"></div>
-                <span>ババ</span>
+                <span>ババ (-10ルピー)</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color" style="background: #4CAF50; box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);"></div>
@@ -416,6 +419,17 @@
         let gameState = 'ready'; // ready, playing, won, lost
         let showProbability = true; // 確率表示のフラグ
         let simulatorGrid = []; // シミュレーター用の内部グリッド
+        
+        // ルピー計算用の値
+        const rupeeValues = {
+            green: 1,
+            blue: 5,
+            red: 20,
+            silver: 100,
+            gold: 300,
+            baba: -10,
+            hazard: 0
+        };
         
         const difficulties = {
             beginner: { rows: 4, cols: 5, hazards: 4, name: '初級' },
@@ -726,6 +740,7 @@
         function updateDisplay() {
             let inputCount = 0;
             let hazardCount = 0;
+            let totalRupees = 0;
             
             for (let i = 0; i < rows; i++) {
                 for (let j = 0; j < cols; j++) {
@@ -738,11 +753,26 @@
                             inputCount++;
                             if (simCell.isHazard || simCell.isBaba) {
                                 hazardCount++;
+                                // ルピー計算
+                                if (simCell.isBaba) {
+                                    totalRupees += rupeeValues.baba;
+                                }
+                            } else {
+                                // 通常セルのルピー計算
+                                totalRupees += rupeeValues[simCell.color] || 0;
                             }
                         }
                     } else {
                         if (cell.state !== 'unknown') {
                             inputCount++;
+                            // 攻略支援モードでのルピー計算
+                            if (cell.state === 'hazard') {
+                                hazardCount++;
+                            } else if (cell.state === 'baba') {
+                                totalRupees += rupeeValues.baba;
+                            } else if (rupeeValues[cell.state]) {
+                                totalRupees += rupeeValues[cell.state];
+                            }
                         }
                         if (cell.state === 'hazard') {
                             hazardCount++;
@@ -802,6 +832,7 @@
             document.getElementById('input-count').textContent = inputCount;
             document.getElementById('remaining-hazards').textContent = totalHazards - hazardCount;
             document.getElementById('current-difficulty').textContent = difficulties[currentDifficulty].name;
+            document.getElementById('total-rupees').textContent = totalRupees;
         }
         
         function analyzeGrid() {
@@ -903,10 +934,21 @@
             
             // 確率情報を追加
             const probabilities = [];
+            let expectedRupees = 0;
             for (let i = 0; i < rows; i++) {
                 for (let j = 0; j < cols; j++) {
                     if (gameGrid[i][j].state === 'unknown' && gameGrid[i][j].probability !== null) {
                         probabilities.push(gameGrid[i][j].probability);
+                    }
+                }
+            }
+            
+            // 期待値計算（簡易版）
+            let unknownSafeCells = 0;
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    if (gameGrid[i][j].state === 'unknown' && gameGrid[i][j].analysis === 'safe') {
+                        unknownSafeCells++;
                     }
                 }
             }
@@ -916,6 +958,11 @@
                 const minProb = Math.min(...probabilities);
                 const maxProb = Math.max(...probabilities);
                 analysisText.push(`📊 危険確率: 最小${minProb}% 最大${maxProb}% 平均${avgProb}%`);
+                
+                // 期待ルピー計算の追加
+                if (unknownSafeCells > 0) {
+                    analysisText.push(`💰 安全確定セルからの期待ルピー: ${unknownSafeCells}ルピー以上`);
+                }
             }
             
             if (analysisText.length === 0) {
